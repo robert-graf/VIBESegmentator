@@ -71,14 +71,14 @@ Download the nnUNet weights automatically. They are put in `[Path to this projec
 
 ## Run
 ```bash
-# Run this commands in a Terminal where you navigate to the folder where `run_TotalVibeSegmentator.py` is
-conda activate TotalVibeSegmentator
+# Run this commands in a Terminal where you navigate to the folder where `run_VIBESegmentator.py` is
+conda activate VIBESegmentator
 
 # Total Segmentation
-python run_TotalVibeSegmentator.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
+python run_VIBESegmentator.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
 
 # Total Segmentation with postprocessing and combining of masks
-python run_TotalVibeSegmentator_multi.py --img_inphase [IMAGE-PATH] --img_water [IMAGE-PATH] --img_outphase [IMAGE-PATH]  --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
+python run_VIBESegmentator_multi.py --img_inphase [IMAGE-PATH] --img_water [IMAGE-PATH] --img_outphase [IMAGE-PATH]  --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
 
 # Spine Instance
 python run_instance_spine_segmentation.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
@@ -92,22 +92,22 @@ python run_semantic_spine_segmentation.py --img [IMAGE-PATH] --out_path [OUTPATH
 ### Running an Example
 ```bash
 conda activate VIBESegmentator
-#cd to the folder where you downloaded the GitHub files (the folder where the run_TotalVibeSegmentator.py is located)
+#cd to the folder where you downloaded the GitHub files (the folder where the run_VIBESegmentator.py is located)
 ```
 Let's run some examples that were never seen during training. You can download all four examples from [here](https://github.com/robert-graf/VIBESegmentator/releases/download/example/example_mri.zip) 
 
 (Source: [link](https://zenodo.org/records/11367005) Number s0284, s0286, s0287, s0288)
 
-Unzip the file. For this example, we copied all files to a folder called 'example' where the run_TotalVibeSegmentator.py is located.
+Unzip the file. For this example, we copied all files to a folder called 'example' where the run_VIBESegmentator.py is located.
 ```bash
 
-python run_TotalVibeSegmentator.py --img example/mri1.nii.gz --out_path  example/seg1.nii.gz
+python run_VIBESegmentator.py --img example/mri1.nii.gz --out_path  example/seg1.nii.gz
 
-python run_TotalVibeSegmentator.py --img example/mri2.nii.gz --out_path  example/seg2.nii.gz
+python run_VIBESegmentator.py --img example/mri2.nii.gz --out_path  example/seg2.nii.gz
 
-python run_TotalVibeSegmentator.py --img example/mri3.nii.gz --out_path  example/seg3.nii.gz
+python run_VIBESegmentator.py --img example/mri3.nii.gz --out_path  example/seg3.nii.gz
 
-python run_TotalVibeSegmentator.py --img example/mri4.nii.gz --out_path  example/seg4.nii.gz
+python run_VIBESegmentator.py --img example/mri4.nii.gz --out_path  example/seg4.nii.gz
 ```
 The segmentation is stored in "example/segX.nii.gz." You can view the results with [ITKSnap](http://www.itksnap.org/pmwiki/pmwiki.php) by first drag-and-drop the mriX.nii.gz and then drag-and-drop the segX.nii.gz (with X is a number from before) and click on "Open as Segmentation"
 
@@ -206,6 +206,6 @@ The related paper is available as preprint: [arXiv:2406.00125](https://arxiv.org
 
 ## Other networks
 
-`run_TotalVibeSegmentator.py [...] --dataset_id 278` 
+`run_VIBESegmentator.py [...] --dataset_id 278` 
 
 ![Slices](/imgs/roi.jpg)

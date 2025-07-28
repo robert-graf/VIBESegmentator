@@ -12,7 +12,7 @@ from inference.auto_download import download_weights  # noqa: I001
 from inference.inference_nnunet import get_ds_info
 from inference.inference_nnunet import p as model_path
 from inference.inference_nnunet import run_inference_on_file
-from run_TotalVibeSegmentator import run_roi
+from run_VIBESegmentator import run_roi
 
 logger = Print_Logger()
 idx_models = [99, 86, 85]  # first found is used
