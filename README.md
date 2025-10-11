@@ -194,13 +194,17 @@ To run this script on your data, update the paths.
 
 
 ## How to Cite
+Open access paper: [doi:10.1007/s00330-025-12035-9](https://doi.org/10.1007/s00330-025-12035-9)
+
 The related paper is available as preprint: [arXiv:2406.00125](https://arxiv.org/abs/2406.00125)
 ```
-@article{graf2024VIBESegmentator,
-  title={VIBESegmentator:  Full Body MRI Segmentation for the NAKO and UK Biobank },
-  author={Graf, Robert and Platzek, Paul-S{\"o}ren and Riedel, Evamaria Olga and Ramsch{\"u}tz, Constanze and Starck, Sophie and M{\"o}ller, Hendrik Kristian and Atad, Matan and V{\"o}lzke, Henry and B{\"u}low, Robin and Schmidt, Carsten Oliver and others},
-  journal={arXiv preprint arXiv:2406.00125},
-  year={2024}
+@article{graf2025vibesegmentator,
+  title={VIBESegmentator: full body MRI segmentation for the NAKO and UK Biobank},
+  author={Graf, Robert and Platzek, Paul and Riedel, Evamaria Olga and Ramsch{\"u}tz, Constanze and Starck, Sophie and M{\"o}ller, Hendrik K and Atad, Matan and V{\"o}lzke, Henry and B{\"u}low, Robin and Schmidt, Carsten Oliver and others},
+  journal={European Radiology},
+  pages={1--15},
+  year={2025},
+  publisher={Springer}
 }
 ```
 
