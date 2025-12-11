@@ -24,7 +24,7 @@ from typing import Any
 from tqdm import tqdm
 
 logger = logging.getLogger(__name__)
-WEIGHTS_URL_ = "https://github.com/robert-graf/TotalVibeSegmentator/releases/download/v1.0.0/"
+WEIGHTS_URL_ = "https://github.com/robert-graf/VIBESegmentator/releases/download/v1.0.0/"
 env_name = "TOTALVIBE_WEIGHTS_PATH"
 
 

@@ -49,12 +49,12 @@ def run_total_seg(
         for idx in known_idx:
             download_weights(idx)
             try:
-                next(next(iter(model_path.glob(f"*{idx}*"))).glob("*__nnUNetPlans*"))
+                next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNetPlans*"))
                 dataset_id = idx
                 break
             except StopIteration:
                 try:
-                    next(next(iter(model_path.glob(f"*{idx}*"))).glob("*__nnUNet*ResEnc*"))
+                    next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNet*ResEnc*"))
                     dataset_id = idx
                 except StopIteration:
                     pass
@@ -86,6 +86,7 @@ def run_total_seg(
                 "Your affine matrix is the identity. Make sure that the spacing and orientation is correct. For NAKO it should be 1.40625 mm for R/L and A/P and 3 mm S/I. For UKBB R/L and A/P should be around 2.2 mm",
                 stacklevel=3,
             )
+
         return run_inference_on_file(
             dataset_id,
             in_niis,
