@@ -56,6 +56,7 @@ def run_total_seg(
                 try:
                     next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNet*ResEnc*"))
                     dataset_id = idx
+                    break
                 except StopIteration:
                     pass
         else:

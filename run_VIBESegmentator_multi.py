@@ -14,8 +14,12 @@ from inference.inference_nnunet import p as model_path
 from inference.inference_nnunet import run_inference_on_file
 from run_VIBESegmentator import run_roi
 
+"""
+This is the merging skriped described in the Paper for VIBE images. With the newst verison it is no longer recomended to use this, because the model is now good enought with a singel inference.
+Using this script often causes to increase the size of some label that are prioritiesed. This effect is minimal.
+"""
 logger = Print_Logger()
-idx_models = [99, 86, 85]  # first found is used
+idx_models = [100]  # first found is used
 
 labels = {
     1: {"typ": "organ", "name": "spleen", "min": 1, "max": 1, "autofix": 100},
@@ -113,11 +117,16 @@ def run_total_seg(
         for idx in known_idx:
             download_weights(idx)
             try:
-                next(next(iter(model_path.glob(f"*{idx}*"))).glob("*__nnUNetPlans*"))
+                next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNetPlans*"))
                 dataset_id = idx
                 break
             except StopIteration:
-                pass
+                try:
+                    next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNet*ResEnc*"))
+                    dataset_id = idx
+                    break
+                except StopIteration:
+                    pass
         else:
             logger.print(f"Could not find model. Download the model an put it into {model_path.absolute()}", Log_Type.FAIL)
             return
@@ -174,23 +183,26 @@ def validate_seg(nii: NII | Path, path_seg: Path, save_prob=False, aggressivenes
     nii = to_nii_seg(nii)
     path = path_seg.parent
     logger = Print_Logger()
-    arrs, dicts = nii.get_connected_components(nii.unique())
-    for idx, n_cc in dicts.items():
+    u = nii.unique()
+    arrs = nii.get_connected_components(u)
+    for idx in u:
+        ccs = (arrs * nii.extract_label(idx)).unique()
+        n_cc = len(ccs)
         problem = False
         target = labels[idx]
         if n_cc > target["max"]:
-            logger.print(f"{target['name']}: got {n_cc} cc, but we expected less than {target['max']}", verbose=verbose)
+            logger.print(f"{target['name']}: got {n_cc} cc, but we expected <= {target['max']}", verbose=verbose)
             problem = True
         if n_cc < target["min"]:
-            logger.print(f"{target['name']}: got {n_cc} cc, but we expected more than {target['min']}", verbose=verbose)
+            logger.print(f"{target['name']}: got {n_cc} cc, but we expected > {target['min']}", verbose=verbose)
             problem = True
         if problem:
-            arr = arrs[idx]
+            arr = arrs.extract_label(ccs, keep_label=True)
             if save_prob:
                 out = nii.set_array(arr)
                 out = out + out.dilate_msk(2) * 100
                 out.save(path / "problematic" / (target["name"] + ".nii.gz"))
-            for i in np.unique(arr):
+            for i in ccs:
                 if i == 0:
                     continue
                 arr2 = arr.copy()
@@ -201,7 +213,7 @@ def validate_seg(nii: NII | Path, path_seg: Path, save_prob=False, aggressivenes
                 if "autofix" in target:
                     max_cc_vol = int(target["autofix"]) * aggressiveness
                     if vol <= max_cc_vol:
-                        forb += " --> autofix"
+                        forb += " --> autofix; set to 0"
                         nii = nii * nii.set_array(1 - arr2)
                     else:
                         forb += " --> unchanged"
@@ -271,7 +283,7 @@ def combine(inter_file: dict[str, tuple[Path, Path]], out_path: Path, override=F
                     continue
                 label = x.extract_label(idx)
                 if labels[idx]["max"] == 1 and name != "vessel":
-                    label = label.get_largest_k_segmentation_connected_components(1)
+                    label = label.filter_connected_components(max_count_component=1).clamp(0, 1)
                 label = label.get_array()
                 arr[arr == 0] = label[arr == 0] * idx
     validate_seg(out.set_array(arr), out_path, aggressiveness=15, verbose=verbose, fill_holes=fill_holes)
