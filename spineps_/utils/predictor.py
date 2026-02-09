@@ -133,14 +133,13 @@ class nnUNetPredictor:
                     self.network.load_state_dict(params)
                 else:
                     self.network._orig_mod.load_state_dict(params)
-                if self.device.type == "cuda":
-                    if not torch.cuda.is_available():
-                        Print_Logger().on_fail(
-                            "No CUDA device. If you have a CUDA-able GPU (Nvidia), reinstall pytorch with cuda or for non-cuda devices use --ddevice cpu or --ddevice mps"
-                        )
-                    self.network.cuda()
+                if self.device.type == "cuda" and not torch.cuda.is_available():
+                    Print_Logger().on_warning(
+                        "No CUDA device. If you have a CUDA-able GPU (Nvidia), reinstall pytorch with cuda or for non-cuda devices use --ddevice cpu or --ddevice mps"
+                    )
+
                 if self.device.type == "mps" and not (hasattr(torch.backends, "mps") and torch.backends.mps.is_available()):
-                    Print_Logger().on_fail("No MPS device found. Use --ddevice cpu or --ddevice mps")
+                    Print_Logger().on_warning("No MPS device found. Use --ddevice cpu or --ddevice mps")
                 self.network.to(self.device)
                 self.network.eval()
                 self.loaded_networks.append(self.network)
