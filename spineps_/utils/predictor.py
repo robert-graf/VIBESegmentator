@@ -132,17 +132,13 @@ class nnUNetPredictor:
                     self.network.load_state_dict(params)
                 else:
                     self.network._orig_mod.load_state_dict(params)
-                self.network.cuda()
+                if self.device.type == "cuda":
+                    self.network.cuda()
                 self.network.eval()
                 self.loaded_networks.append(self.network)
         # print(type(self.loaded_networks[0]))
 
-    def predict_single_npy_array(
-        self,
-        input_image: np.ndarray,
-        image_properties: dict,
-        save_or_return_probabilities: bool = False,
-    ):
+    def predict_single_npy_array(self, input_image: np.ndarray, image_properties: dict, save_or_return_probabilities: bool = False):
         """
         image_properties must only have a 'spacing' key!
         """
@@ -395,83 +391,82 @@ class nnUNetPredictor:
         # If the device_type is 'mps' then it will complain that mps is not implemented, even if enabled=False
         # is set. Whyyyyyyy. (this is why we don't make use of enabled=False)
         # So autocast will only be active if we have a cuda device.
-        with torch.no_grad():
-            with torch.autocast(self.device.type, enabled=True) if self.device.type == "cuda" else dummy_context():
-                assert len(input_image.shape) == 4, "input_image must be a 4D np.ndarray or torch.Tensor (c, x, y, z)"
+        with torch.no_grad(), torch.autocast(self.device.type, enabled=True) if self.device.type == "cuda" else dummy_context():
+            assert len(input_image.shape) == 4, "input_image must be a 4D np.ndarray or torch.Tensor (c, x, y, z)"
 
-                if self.verbose:
-                    print(f"Input shape: {input_image.shape}")
-                if self.verbose:
-                    print("step_size:", self.tile_step_size)
-                if self.verbose:
-                    print(
-                        "mirror_axes:",
-                        self.allowed_mirroring_axes if self.use_mirroring else None,
-                    )
-
-                # if input_image is smaller than tile_size we need to pad it to tile_size.
-                data, slicer_revert_padding = pad_nd_image(
-                    input_image,
-                    self.configuration_manager.patch_size,
-                    "constant",
-                    {"value": 0},
-                    True,
-                    None,
+            if self.verbose:
+                print(f"Input shape: {input_image.shape}")
+            if self.verbose:
+                print("step_size:", self.tile_step_size)
+            if self.verbose:
+                print(
+                    "mirror_axes:",
+                    self.allowed_mirroring_axes if self.use_mirroring else None,
                 )
 
-                slicers = self._internal_get_sliding_window_slicers(data.shape[1:])
+            # if input_image is smaller than tile_size we need to pad it to tile_size.
+            data, slicer_revert_padding = pad_nd_image(
+                input_image,
+                self.configuration_manager.patch_size,
+                "constant",
+                {"value": 0},
+                True,
+                None,
+            )
 
-                # preallocate results and num_predictions
-                results_device = self.device if self.perform_everything_on_gpu else torch.device("cpu")
-                if self.verbose:
-                    print("preallocating arrays")
-                try:
-                    data = data.to(self.device)
-                    predicted_logits = torch.zeros(
-                        (self.label_manager.num_segmentation_heads, *data.shape[1:]),
-                        dtype=torch.half,
+            slicers = self._internal_get_sliding_window_slicers(data.shape[1:])
+
+            # preallocate results and num_predictions
+            results_device = self.device if self.perform_everything_on_gpu else torch.device("cpu")
+            if self.verbose:
+                print("preallocating arrays")
+            try:
+                data = data.to(self.device)
+                predicted_logits = torch.zeros(
+                    (self.label_manager.num_segmentation_heads, *data.shape[1:]),
+                    dtype=torch.half,
+                    device=results_device,
+                )
+                n_predictions = torch.zeros(data.shape[1:], dtype=torch.half, device=results_device)
+                if self.use_gaussian:
+                    gaussian = compute_gaussian(
+                        tuple(self.configuration_manager.patch_size),
+                        sigma_scale=1.0 / 8,
+                        value_scaling_factor=1000,
                         device=results_device,
                     )
-                    n_predictions = torch.zeros(data.shape[1:], dtype=torch.half, device=results_device)
-                    if self.use_gaussian:
-                        gaussian = compute_gaussian(
-                            tuple(self.configuration_manager.patch_size),
-                            sigma_scale=1.0 / 8,
-                            value_scaling_factor=1000,
-                            device=results_device,
-                        )
-                except RuntimeError:
-                    # sometimes the stuff is too large for GPUs. In that case fall back to CPU
-                    results_device = torch.device("cpu")
-                    data = data.to(results_device)
-                    predicted_logits = torch.zeros(
-                        (self.label_manager.num_segmentation_heads, *data.shape[1:]),
-                        dtype=torch.half,
+            except RuntimeError:
+                # sometimes the stuff is too large for GPUs. In that case fall back to CPU
+                results_device = torch.device("cpu")
+                data = data.to(results_device)
+                predicted_logits = torch.zeros(
+                    (self.label_manager.num_segmentation_heads, *data.shape[1:]),
+                    dtype=torch.half,
+                    device=results_device,
+                )
+                n_predictions = torch.zeros(data.shape[1:], dtype=torch.half, device=results_device)
+                if self.use_gaussian:
+                    gaussian = compute_gaussian(
+                        tuple(self.configuration_manager.patch_size),
+                        sigma_scale=1.0 / 8,
+                        value_scaling_factor=1000,
                         device=results_device,
                     )
-                    n_predictions = torch.zeros(data.shape[1:], dtype=torch.half, device=results_device)
-                    if self.use_gaussian:
-                        gaussian = compute_gaussian(
-                            tuple(self.configuration_manager.patch_size),
-                            sigma_scale=1.0 / 8,
-                            value_scaling_factor=1000,
-                            device=results_device,
-                        )
-                finally:
-                    empty_cache(self.device)
+            finally:
+                empty_cache(self.device)
 
-                if self.verbose:
-                    print("running prediction")
-                for sl in tqdm(slicers, disable=not self.allow_tqdm):
-                    workon = data[sl][None]
-                    workon = workon.to(self.device, non_blocking=False)
+            if self.verbose:
+                print("running prediction")
+            for sl in tqdm(slicers, disable=not self.allow_tqdm):
+                workon = data[sl][None]
+                workon = workon.to(self.device, non_blocking=False)
 
-                    prediction = self._internal_maybe_mirror_and_predict(workon, network=network)[0].to(results_device)
+                prediction = self._internal_maybe_mirror_and_predict(workon, network=network)[0].to(results_device)
 
-                    predicted_logits[sl] += prediction * gaussian if self.use_gaussian else prediction
-                    n_predictions[sl[1:]] += gaussian if self.use_gaussian else 1
+                predicted_logits[sl] += prediction * gaussian if self.use_gaussian else prediction
+                n_predictions[sl[1:]] += gaussian if self.use_gaussian else 1
 
-                predicted_logits /= n_predictions
+            predicted_logits /= n_predictions
         # empty_cache(self.device)
         return predicted_logits[tuple([slice(None), *slicer_revert_padding[1:]])]
 

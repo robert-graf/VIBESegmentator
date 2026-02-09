@@ -86,6 +86,7 @@ def load_inf_model(
                 use_folds=use_folds,
             )
             logger.print("Checkpoint final not found, will load from best instead", Log_Type.WARNING)
+
         else:
             raise e  # noqa: TRY201
     logger.print(f"Inference Model loaded from {model_folder}") if verbose else None
