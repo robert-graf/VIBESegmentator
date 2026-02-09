@@ -10,6 +10,7 @@ from acvl_utils.cropping_and_padding.padding import pad_nd_image
 from batchgenerators.utilities.file_and_folder_operations import join, load_json
 from nnunetv2.utilities.label_handling.label_handling import determine_num_input_channels
 from torch._dynamo import OptimizedModule
+from TPTBox import Print_Logger
 from tqdm import tqdm
 
 from spineps_.utils.data_iterators import PreprocessAdapterFromNpy
@@ -133,7 +134,14 @@ class nnUNetPredictor:
                 else:
                     self.network._orig_mod.load_state_dict(params)
                 if self.device.type == "cuda":
+                    if not torch.cuda.is_available():
+                        Print_Logger().on_fail(
+                            "No CUDA device. If you have a CUDA-able GPU (Nvidia), reinstall pytorch with cuda or for non-cuda devices use --ddevice cpu or --ddevice mps"
+                        )
                     self.network.cuda()
+                if self.device.type == "mps" and not (hasattr(torch.backends, "mps") and torch.backends.mps.is_available()):
+                    Print_Logger().on_fail("No MPS device found. Use --ddevice cpu or --ddevice mps")
+                self.network.to(self.device)
                 self.network.eval()
                 self.loaded_networks.append(self.network)
         # print(type(self.loaded_networks[0]))
@@ -271,7 +279,7 @@ class nnUNetPredictor:
 
             # CPU version
             if prediction is None:
-                print("FALL BACK CPU")
+                print("Run on CPU")
                 for idx, params in enumerate(self.list_of_parameters):
                     network = None
                     if self.loaded_networks is not None:
