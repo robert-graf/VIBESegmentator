@@ -1,4 +1,4 @@
-# TotalVibeSegmentator:  Full Body MRI Segmentation for the NAKO and UK Biobank 
+# VIBESegmentator:  Full Body MRI Segmentation for the NAKO and UK Biobank 
 
 ![3D Render](/imgs/3d_render_github.png)
 
@@ -8,17 +8,22 @@ You can select older versions with `--dataset_id [ID]`
 
 |ID   |             NAME             | Version                       |Modality       | Resolution          |Link|
 |---  | ----------------             | ------------------------------|--------       | --------------------|----|
-|99   |TotalVIBESegmentator          | publication version (current) | MRI/CT        | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
+|100  |VIBESegmentator          | current                       | MRI/CT        | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
+|99   |VIBESegmentator          | current (sagittal resolution) | MRI/CT        | sagittal 1.41 mm, R=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
 |278  |Splits the body in 11 regions |current                        | NAKO VIBE-only| iso 4 mm            |    |
-|282  |Torso Water-Fat-swap detection|current      | multi-echo-Vibe VIBE  | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2502.14659); [See also](https://github.com/robert-graf/MAGO-SP)|
-|511  |Spine Vertebra instance       |                               | VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
+|282  |Torso Water-Fat-swap detection|current (use script from linked repo)      | multi-echo-Vibe VIBE  | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2502.14659); [Other Repo](https://github.com/robert-graf/MAGO-SP)|
+|511  |Spine Vertebra instance       |Fast, but may produce off-by-one errors. Use [SPINEPS](https://github.com/Hendrik-code/spineps) if this method fails.| VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
 |512  |Spine Vertebra subregion      |incorporated in SPINEPS       | VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
 |520  | CT Bone segmentations        | preliminary                   | CT            | iso 0.8 mm          |     |
-<!---
-|80   |TotalVIBESegmentator          | preprint                      | MRI           | axial 1.41 mm, S=3mm|    |
-|85-87|TotalVIBESegmentator          | early preprint (deprecated)   | MRI           | axial 1.41 mm, S=3mm|    |
-|98   |TotalVIBESegmentator| preprint (deprecated-spinal channel bugged in CT)| MRI/CT| axial 1.41 mm, S=3mm|    |
---->
+
+### Outdated/deprecated
+
+|ID   |             NAME             | Version                       |Modality       | Resolution          |Link|
+|---  | ----------------             | ------------------------------|--------       | --------------------|----|
+|98   |VIBESegmentator| (deprecated-spinal channel bugged in CT)| MRI| axial 1.41 mm, S=3mm|    |
+|80   |VIBESegmentator          | preprint (deprecated)| MRI           | axial 1.41 mm, S=3mm|    |
+|85-87|VIBESegmentator          | early preprint (deprecated)   | MRI           | axial 1.41 mm, S=3mm|    |
+
 
 ## Installation Guide
 
@@ -39,8 +44,8 @@ You can select older versions with `--dataset_id [ID]`
 ```bash
 # Run this commands by coping in to the Terminal
 # Recommended: make a virtual Python environment (example shows Anaconda)
-conda create -n "TotalVibeSegmentator" python=3.11.0
-conda activate TotalVibeSegmentator
+conda create -n "VIBESegmentator" python=3.11.0
+conda activate VIBESegmentator
 
 # Install PyTorch that works with your GPU (follow instructions at https://pytorch.org/get-started/locally/)
 pip install torch torchvision torchaudio
@@ -56,8 +61,8 @@ pip install nnunetv2
 #pip install nnunetv2==2.4.2
 
 # Download the scripts (they will be downloaded to your current folder)
-git clone https://github.com/robert-graf/TotalVibeSegmentator.git
-cd TotalVibeSegmentator
+git clone https://github.com/robert-graf/VIBESegmentator.git
+cd VIBESegmentator
 ```
 It should take less than 30 minutes to install, excluding installing conda/python. The longest time takes to install pytroch. 
 ## Download
@@ -66,14 +71,14 @@ Download the nnUNet weights automatically. They are put in `[Path to this projec
 
 ## Run
 ```bash
-# Run this commands in a Terminal where you navigate to the folder where `run_TotalVibeSegmentator.py` is
-conda activate TotalVibeSegmentator
+# Run this commands in a Terminal where you navigate to the folder where `run_VIBESegmentator.py` is
+conda activate VIBESegmentator
 
 # Total Segmentation
-python run_TotalVibeSegmentator.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
+python run_VIBESegmentator.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
 
 # Total Segmentation with postprocessing and combining of masks
-python run_TotalVibeSegmentator_multi.py --img_inphase [IMAGE-PATH] --img_water [IMAGE-PATH] --img_outphase [IMAGE-PATH]  --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
+python run_VIBESegmentator_multi.py --img_inphase [IMAGE-PATH] --img_water [IMAGE-PATH] --img_outphase [IMAGE-PATH]  --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
 
 # Spine Instance
 python run_instance_spine_segmentation.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
@@ -86,23 +91,23 @@ python run_semantic_spine_segmentation.py --img [IMAGE-PATH] --out_path [OUTPATH
 
 ### Running an Example
 ```bash
-conda activate TotalVibeSegmentator
-#cd to the folder where you downloaded the GitHub files (the folder where the run_TotalVibeSegmentator.py is located)
+conda activate VIBESegmentator
+#cd to the folder where you downloaded the GitHub files (the folder where the run_VIBESegmentator.py is located)
 ```
-Let's run some examples that were never seen during training. You can download all four examples from [here](https://github.com/robert-graf/TotalVibeSegmentator/releases/download/example/example_mri.zip) 
+Let's run some examples that were never seen during training. You can download all four examples from [here](https://github.com/robert-graf/VIBESegmentator/releases/download/example/example_mri.zip) 
 
 (Source: [link](https://zenodo.org/records/11367005) Number s0284, s0286, s0287, s0288)
 
-Unzip the file. For this example, we copied all files to a folder called 'example' where the run_TotalVibeSegmentator.py is located.
+Unzip the file. For this example, we copied all files to a folder called 'example' where the run_VIBESegmentator.py is located.
 ```bash
 
-python run_TotalVibeSegmentator.py --img example/mri1.nii.gz --out_path  example/seg1.nii.gz
+python run_VIBESegmentator.py --img example/mri1.nii.gz --out_path  example/seg1.nii.gz
 
-python run_TotalVibeSegmentator.py --img example/mri2.nii.gz --out_path  example/seg2.nii.gz
+python run_VIBESegmentator.py --img example/mri2.nii.gz --out_path  example/seg2.nii.gz
 
-python run_TotalVibeSegmentator.py --img example/mri3.nii.gz --out_path  example/seg3.nii.gz
+python run_VIBESegmentator.py --img example/mri3.nii.gz --out_path  example/seg3.nii.gz
 
-python run_TotalVibeSegmentator.py --img example/mri4.nii.gz --out_path  example/seg4.nii.gz
+python run_VIBESegmentator.py --img example/mri4.nii.gz --out_path  example/seg4.nii.gz
 ```
 The segmentation is stored in "example/segX.nii.gz." You can view the results with [ITKSnap](http://www.itksnap.org/pmwiki/pmwiki.php) by first drag-and-drop the mriX.nii.gz and then drag-and-drop the segX.nii.gz (with X is a number from before) and click on "Open as Segmentation"
 
@@ -189,18 +194,22 @@ To run this script on your data, update the paths.
 
 
 ## How to Cite
+Open access paper: [doi:10.1007/s00330-025-12035-9](https://doi.org/10.1007/s00330-025-12035-9)
+
 The related paper is available as preprint: [arXiv:2406.00125](https://arxiv.org/abs/2406.00125)
 ```
-@article{graf2024totalvibesegmentator,
-  title={TotalVibeSegmentator:  Full Body MRI Segmentation for the NAKO and UK Biobank },
-  author={Graf, Robert and Platzek, Paul-S{\"o}ren and Riedel, Evamaria Olga and Ramsch{\"u}tz, Constanze and Starck, Sophie and M{\"o}ller, Hendrik Kristian and Atad, Matan and V{\"o}lzke, Henry and B{\"u}low, Robin and Schmidt, Carsten Oliver and others},
-  journal={arXiv preprint arXiv:2406.00125},
-  year={2024}
+@article{graf2025vibesegmentator,
+  title={VIBESegmentator: full body MRI segmentation for the NAKO and UK Biobank},
+  author={Graf, Robert and Platzek, Paul and Riedel, Evamaria Olga and Ramsch{\"u}tz, Constanze and Starck, Sophie and M{\"o}ller, Hendrik K and Atad, Matan and V{\"o}lzke, Henry and B{\"u}low, Robin and Schmidt, Carsten Oliver and others},
+  journal={European Radiology},
+  pages={1--15},
+  year={2025},
+  publisher={Springer}
 }
 ```
 
 ## Other networks
 
-`run_TotalVibeSegmentator.py [...] --dataset_id 278` 
+`run_VIBESegmentator.py [...] --dataset_id 278` 
 
 ![Slices](/imgs/roi.jpg)

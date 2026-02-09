@@ -18,12 +18,14 @@ p = out_base / "nnUNet_results"
 
 def get_ds_info(idx) -> dict:
     try:
-        nnunet_path = next(next(iter(p.glob(f"*{idx}*"))).glob("*__nnUNetPlans*"))
+        nnunet_path = next(next(iter(p.glob(f"*{idx:03}*"))).glob("*__nnUNetPlans*"))
     except StopIteration:
         try:
-            nnunet_path = next(next(iter(p.glob(f"*{idx}*"))).glob("*__nnUNet*ResEnc*"))
+            nnunet_path = next(next(iter(p.glob(f"*{idx:03}*"))).glob("*__nnUNet*ResEnc*"))
         except StopIteration:
-            Print_Logger().print(f"Please add Dataset {idx} to {p}", Log_Type.FAIL)
+            Print_Logger().print(
+                f"Please add Dataset {idx} to {p}; {[list(a.iterdir()) for a in list(p.glob(f'*{idx:03}*')) if a.is_dir()]}", Log_Type.FAIL
+            )
             p.mkdir(exist_ok=True, parents=True)
             exit()
     with open(Path(nnunet_path, "dataset.json")) as f:
@@ -60,9 +62,9 @@ def run_inference_on_file(
 
     download_weights(idx)
     try:
-        nnunet_path = next(next(iter(p.glob(f"*{idx}*"))).glob("*__nnUNetPlans*"))
+        nnunet_path = next(next(iter(p.glob(f"*{idx:03}*"))).glob("*__nnUNetPlans*"))
     except StopIteration:
-        nnunet_path = next(next(iter(p.glob(f"*{idx}*"))).glob("*__nnUNet*ResEnc*"))
+        nnunet_path = next(next(iter(p.glob(f"*{idx:03}*"))).glob("*__nnUNet*ResEnc*"))
     folds = [int(f.name.split("fold_")[-1]) for f in nnunet_path.glob("fold*")]
     if max_folds is not None:
         folds = folds[:max_folds]
@@ -94,16 +96,17 @@ def run_inference_on_file(
         input_nii = [i.reorient(orientation) for i in input_nii]
 
     if zoom is not None:
-        input_nii = [i.rescale_(zoom) for i in input_nii]
+        input_nii = [i.rescale_(zoom, mode="nearest") for i in input_nii]
     input_nii = [squash_so_it_fits_in_float16(i) for i in input_nii]
     if crop:
         crop = input_nii[0].compute_crop(minimum=20)
         input_nii = [i.apply_crop(crop) for i in input_nii]
+
     seg_nii, uncertainty_nii, softmax_logits = run_inference(input_nii, nnunet, logits=logits)
     if mapping is not None:
         seg_nii.map_labels_(mapping)
     if not keep_size:
-        seg_nii.resample_from_to_(og_nii)
+        seg_nii.resample_from_to_(og_nii, mode="nearest")
     if fill_holes:
         seg_nii.fill_holes_()
     if out_file is not None and (not Path(out_file).exists() or override):

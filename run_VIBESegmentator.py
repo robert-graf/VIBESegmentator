@@ -12,7 +12,7 @@ from inference.inference_nnunet import get_ds_info, run_inference_on_file
 from inference.inference_nnunet import p as model_path
 
 logger = Print_Logger()
-idx_models = [99, 80, 87, 86, 85]  # first found is used; Recommended is the earlier ones.
+idx_models = [100, 99, 80, 87, 86, 85]  # first found is used; Recommended is the earlier ones.
 
 
 def run_roi(nii: str | Path, out_file: Path | str | None, gpu=None, ddevice="cuda", dataset_id=278, keep_size=False, override=False):
@@ -49,13 +49,14 @@ def run_total_seg(
         for idx in known_idx:
             download_weights(idx)
             try:
-                next(next(iter(model_path.glob(f"*{idx}*"))).glob("*__nnUNetPlans*"))
+                next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNetPlans*"))
                 dataset_id = idx
                 break
             except StopIteration:
                 try:
-                    next(next(iter(model_path.glob(f"*{idx}*"))).glob("*__nnUNet*ResEnc*"))
+                    next(next(iter(model_path.glob(f"*{idx:03}*"))).glob("*__nnUNet*ResEnc*"))
                     dataset_id = idx
+                    break
                 except StopIteration:
                     pass
         else:
@@ -86,6 +87,7 @@ def run_total_seg(
                 "Your affine matrix is the identity. Make sure that the spacing and orientation is correct. For NAKO it should be 1.40625 mm for R/L and A/P and 3 mm S/I. For UKBB R/L and A/P should be around 2.2 mm",
                 stacklevel=3,
             )
+
         return run_inference_on_file(
             dataset_id,
             in_niis,
