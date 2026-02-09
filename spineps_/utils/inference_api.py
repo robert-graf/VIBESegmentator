@@ -78,7 +78,7 @@ def load_inf_model(
     check_name = "checkpoint_final.pth"  # if not allow_non_final else "checkpoint_best.pth"
     try:
         predictor.initialize_from_trained_model_folder(str(model_folder), checkpoint_name=check_name, use_folds=use_folds)
-    except Exception as e:
+    except FileNotFoundError as e:
         if allow_non_final:
             predictor.initialize_from_trained_model_folder(
                 str(model_folder),
@@ -86,6 +86,7 @@ def load_inf_model(
                 use_folds=use_folds,
             )
             logger.print("Checkpoint final not found, will load from best instead", Log_Type.WARNING)
+
         else:
             raise e  # noqa: TRY201
     logger.print(f"Inference Model loaded from {model_folder}") if verbose else None

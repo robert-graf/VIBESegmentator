@@ -162,3 +162,12 @@ Dataset*/
 *.nii.gz
 tmp.txt
 dataset_id
+*.txt
+*.zip
+*.json
+*.python
+nnUnet/
+*.png
+*.pth
+*.xlsx
+*.DS_Store
