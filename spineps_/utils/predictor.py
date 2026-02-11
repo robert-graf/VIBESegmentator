@@ -53,7 +53,7 @@ class nnUNetPredictor:
         self.use_mirroring = use_mirroring
         if device.type == "cuda":
             device = torch.device(type="cuda", index=cuda_id)  # set the desired GPU with CUDA_VISIBLE_DEVICES!
-        self.do_not_use_half_precision = device.type == "cpu"  # float16 not supported by cpu
+        self.do_not_use_half_precision = device.type != "cuda"  # float16 not supported by cpu/mpu
         if device.type != "cuda" and perform_everything_on_gpu:
             print("perform_everything_on_gpu=True is only supported for cuda devices! Setting this to False")
             perform_everything_on_gpu = False
