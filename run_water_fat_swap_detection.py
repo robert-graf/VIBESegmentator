@@ -1,7 +1,8 @@
 import sys
 from pathlib import Path
 
-from TPTBox.segmentation import run_vibeseg
+from TPTBox import to_nii
+from TPTBox.segmentation import run_inference_on_file, run_vibeseg
 
 sys.path.append(str(Path(__file__).parent))
 import argparse
@@ -12,14 +13,12 @@ def get_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run VibeSeg whole-body segmentation on a NIfTI image.")
 
     # run_vibeseg arguments
-    parser.add_argument(
-        "--img",
-        "--img",
-        type=Path,
-        help="Input NIfTI image (.nii.gz).",
-    )
+    parser.add_argument("--img", type=Path, help="Fat or water image")
+    parser.add_argument("--outphase", type=Path, help="outphase image")
+    parser.add_argument("--inphase", "--inphase", type=Path, help="inphase image")
 
     parser.add_argument(
+        "--out_file",
         "--out_seg",
         "--out_path",
         type=Path,
@@ -44,14 +43,6 @@ def get_parser() -> argparse.ArgumentParser:
         choices=["cuda", "cpu", "mps"],
         default="cuda",
         help="Compute device.",
-    )
-
-    parser.add_argument(
-        "--dataset-id",
-        "--dataset_id",
-        type=int,
-        default=100,
-        help="nnU-Net dataset/model identifier.",
     )
 
     parser.add_argument(
@@ -156,8 +147,6 @@ def get_parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     args = vars(get_parser().parse_args())
-
-    img = args.pop("img")
-    out_seg = args.pop("out_seg")
-
-    run_vibeseg(img, out_seg, **args)
+    img, outphase, inphase = args.pop("img"), args.pop("outphase"), args.pop("inphase")
+    a = [img, outphase, inphase]
+    run_inference_on_file(282, [to_nii(a) for a in a], **args)

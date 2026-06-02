@@ -10,11 +10,15 @@ You can select older versions with `--dataset_id [ID]`
 |---  | ----------------             | ------------------------------|--------       | --------------------|----|
 |100  |VIBESegmentator          | current                       | MRI/CT        | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
 |99   |VIBESegmentator          | current (sagittal resolution) | MRI/CT        | sagittal 1.41 mm, R=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
+|12  |VIBESeg-CT-iso-0.8mm |current                        | CT | iso 0.8 mm            |    |
 |278  |Splits the body in 11 regions |current                        | NAKO VIBE-only| iso 4 mm            |    |
-|282  |Torso Water-Fat-swap detection|current (use script from linked repo)      | multi-echo-Vibe VIBE  | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2502.14659); [Other Repo](https://github.com/robert-graf/MAGO-SP)|
-|511  |Spine Vertebra instance       |Fast, but may produce off-by-one errors. Use [SPINEPS](https://github.com/Hendrik-code/spineps) if this method fails.| VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
-|512  |Spine Vertebra subregion      |incorporated in SPINEPS       | VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
-|520  | CT Bone segmentations        | preliminary                   | CT            | iso 0.8 mm          |     |
+|282  |Torso Water-Fat-swap detection¹|current (use script from linked repo)      | multi-echo-Vibe VIBE  | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2502.14659); [Other Repo](https://github.com/robert-graf/MAGO-SP)|
+
+
+All spine segmentation models for VIBE, CT and T2w have been moved to [SPINEPS](https://github.com/Hendrik-code/spineps)
+
+¹ Use run_water_fat_swap_detection.py; If you only want the swap segmented, else look in the other repo
+
 
 ### Outdated/deprecated
 
@@ -23,17 +27,21 @@ You can select older versions with `--dataset_id [ID]`
 |98   |VIBESegmentator| (deprecated-spinal channel bugged in CT)| MRI| axial 1.41 mm, S=3mm|    |
 |80   |VIBESegmentator          | preprint (deprecated)| MRI           | axial 1.41 mm, S=3mm|    |
 |85-87|VIBESegmentator          | early preprint (deprecated)   | MRI           | axial 1.41 mm, S=3mm|    |
+|520  | CT Bone segmentations        | preliminary                   | CT            | iso 0.8 mm          |     |
+|511  |Spine Vertebra instance       |Fast, but may produce off-by-one errors. Use [SPINEPS](https://github.com/Hendrik-code/spineps) if this method fails.| VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
+|512  |Spine Vertebra subregion      |incorporated in SPINEPS       | VIBE-only     | axial 1.41 mm, S=3mm|[See also](https://github.com/Hendrik-code/spineps) |
 
+All outdated/deprecated models are still available, we just no longer recommend them, as their should be better alternatives. 
 
 ## Installation Guide
 
 ### System Requirements
-- Python 3.10 or higher.
+- Python 3.9 or higher.
 - Tested on Ubuntu and Windows.
 - One of the following:
   - Nvidia-GPU with 4 GB of RAM or more.
-  - A mps device (like a newer Mac with M2/M3 , but we could not test this.) (--ddevice mps)
-  - A strong CPU (--ddevice cpu)
+  - A mps device (--ddevice mps)
+  - A strong CPU; This is usually very slow. (--ddevice cpu)
 
 ### Installation Guide
 
@@ -77,16 +85,6 @@ conda activate VIBESegmentator
 # Total Segmentation
 python run_VIBESegmentator.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
 
-# Total Segmentation with postprocessing and combining of masks
-python run_VIBESegmentator_multi.py --img_inphase [IMAGE-PATH] --img_water [IMAGE-PATH] --img_outphase [IMAGE-PATH]  --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
-
-# Spine Instance
-python run_instance_spine_segmentation.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
-
-# Spine Semantic
-python run_semantic_spine_segmentation.py --img [IMAGE-PATH] --out_path [OUTPATH] --ddevice [cpu|cuda|mpu (optional)]
-
-
 ```
 
 ### Running an Example
@@ -113,7 +111,7 @@ The segmentation is stored in "example/segX.nii.gz." You can view the results wi
 
 To run this script on your data, update the paths.
 
-## Label overview
+## Label Model 100 overview
 
 
 |ID | NAME|
@@ -209,6 +207,18 @@ The related paper is available as preprint: [arXiv:2406.00125](https://arxiv.org
 ```
 
 ## Other networks
+`run_VIBESegmentator.py [...] --dataset_id 12` 
+
+Labels see 
+```python
+from TPTBox.core.vert_constants import Full_Body_Instance
+
+for i in Full_Body_Instance:
+    print(f"{i.value:4}\t: {i.name}")
+```
+
+
+
 
 `run_VIBESegmentator.py [...] --dataset_id 278` 
 

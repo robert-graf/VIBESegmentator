@@ -4,19 +4,17 @@ build-backend = "poetry_dynamic_versioning.backend"
 
 [tool.poetry]
 name = "TotalVibeSegmentator"
-#version = "1.0.0"
-#description = "Framework for out-of-the box whole spine MRI segmentation."
-#authors = ["Hendrik Möller <hendrik.moeller@tum.de>"]
-#repository = "https://github.com/Hendrik-code/spineps"
-#homepage = "https://github.com/Hendrik-code/spineps"
-#license = "???"
-#readme = "README.md"
-#exclude = ["models", "examples"]
+version = "1.3.0"
+description = "Full Body segmentation for MRI and CT"
+authors = ["Robert Graf <robert.graf@tum.de>"]
+repository = "https://github.com/robert-graf/VIBESegmentator"
+homepage = "https://github.com/robert-graf/VIBESegmentator"
+license = "Apache-2.0 license"
 
 [tool.poetry.scripts]
 
 [tool.poetry.dependencies]
-python = "^3.10 || ^3.11 || ^3.12"
+python = "^3.9 ||^3.10 || ^3.11 || ^3.12|| ^3.13|| ^3.14"
 TPTBox = "*"
 
 
@@ -166,18 +164,3 @@ docstring-code-format = true
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
-# Add this to your setting.json (user)
-# Ctrl+shift+P settings json
-#"[python]": {
-#        "editor.formatOnSave": true,
-#        "editor.defaultFormatter": "charliermarsh.ruff",
-#        "editor.codeActionsOnSave": {
-#            "source.fixAll": "explicit",
-#            "source.organizeImports": "never"
-#        }
-#      },
-#    "notebook.formatOnSave.enabled": true,
-#    "notebook.codeActionsOnSave": {
-#        "source.fixAll": false,
-#        "source.organizeImports": false
-#    },
