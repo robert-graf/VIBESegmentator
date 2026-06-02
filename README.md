@@ -39,7 +39,7 @@ All outdated/deprecated models are still available, we just no longer recommend 
 - Python 3.9 or higher.
 - Tested on Ubuntu and Windows.
 - One of the following:
-  - Nvidia-GPU with 4 GB of RAM or more.
+  - Nvidia-GPU with 8 GB of RAM or more.
   - A mps device (--ddevice mps)
   - A strong CPU; This is usually very slow. (--ddevice cpu)
 

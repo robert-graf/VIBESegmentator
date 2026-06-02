@@ -16,6 +16,7 @@ license = "Apache-2.0 license"
 [tool.poetry.dependencies]
 python = "^3.9 ||^3.10 || ^3.11 || ^3.12|| ^3.13|| ^3.14"
 TPTBox = "*"
+nnunetv2 = "*"
 
 
 [tool.poetry-dynamic-versioning]
