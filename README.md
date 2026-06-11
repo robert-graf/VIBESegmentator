@@ -8,16 +8,17 @@ You can select older versions with `--dataset_id [ID]`
 
 |ID   |             NAME             | Version                       |Modality       | Resolution          |Link|
 |---  | ----------------             | ------------------------------|--------       | --------------------|----|
-|100  |VIBESegmentator          | current                       | MRI/CT        | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
-|99   |VIBESegmentator          | current (sagittal resolution) | MRI/CT        | sagittal 1.41 mm, R=3mm|[preprint](https://arxiv.org/abs/2406.00125)|
+|100  |VIBESegmentator          | current                       | MRI/CT        | axial 1.41 mm, S=3mm|[Paper](https://doi.org/10.1007/s00330-025-12035-9)|
+|99   |VIBESegmentator          | current (sagittal resolution) | MRI/CT        | sagittal 1.41 mm, R=3mm|[Paper](https://doi.org/10.1007/s00330-025-12035-9)|
 |12  |VIBESeg-CT-iso-0.8mm |current                        | CT | iso 0.8 mm            |    |
+|538  |All Feet bone CT |current (crop to feet required)                       | CT | iso 0.8 mm            |    |
 |278  |Splits the body in 11 regions |current                        | NAKO VIBE-only| iso 4 mm            |    |
 |282  |Torso Water-Fat-swap detection¹|current (use script from linked repo)      | multi-echo-Vibe VIBE  | axial 1.41 mm, S=3mm|[preprint](https://arxiv.org/abs/2502.14659); [Other Repo](https://github.com/robert-graf/MAGO-SP)|
 
 
 All spine segmentation models for VIBE, CT and T2w have been moved to [SPINEPS](https://github.com/Hendrik-code/spineps)
 
-¹ Use run_water_fat_swap_detection.py; If you only want the swap segmented, else look in the other repo
+¹ Use run_water_fat_swap_detection.py; If you only want the swaps segmented, else look in the other repo
 
 
 ### Outdated/deprecated
