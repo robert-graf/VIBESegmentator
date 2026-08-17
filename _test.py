@@ -41,9 +41,6 @@ def main_swap():
     os.chdir(script_dir)
     print(f"Working directory set to: {script_dir}")
 
-    from TPTBox.segmentation import get_outpaths_spineps
-
-    out = get_outpaths_spineps("img.nii.gz", None)
     out_file = "swap.nii.gz"
     cmd = [
         "python",
@@ -77,7 +74,13 @@ def main_spineps():
     for semantic, instance in tasks:
         from TPTBox.segmentation import get_outpaths_spineps  # noqa: PLC0415
 
-        out = get_outpaths_spineps("img.nii.gz", None)
+        try:
+            out = get_outpaths_spineps("img.nii.gz", None)
+        except ModuleNotFoundError:
+            from TPTBox import Print_Logger
+
+            Print_Logger().on_fail("spineps not installed")
+            continue
 
         cmd = [
             "python",
@@ -173,7 +176,7 @@ def main():
             "--dataset_id",
             str(dataset_id),
             "--img",
-            "inphase.nii.gz",
+            "vibe_test/inphase_vibe.nii.gz",
             "--out_path",
             out_file,
             "--override",

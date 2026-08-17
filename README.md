@@ -1,5 +1,5 @@
-# VIBESegmentator:  Full Body MRI Segmentation for the NAKO and UK Biobank 
-
+# VIBESegmentator:  Full Body MRI* Segmentation for the NAKO and UK Biobank 
+*works also on CT!
 ![3D Render](/imgs/3d_render_github.png)
 
 ## Versions
@@ -38,7 +38,7 @@ All outdated/deprecated models are still available, we just no longer recommend 
 ## Installation Guide
 
 ### System Requirements
-- Python 3.9 or higher.
+- Python 3.10 or higher.
 - Tested on Ubuntu and Windows.
 - One of the following:
   - Nvidia-GPU with 8 GB of RAM or more.
@@ -61,9 +61,8 @@ conda activate VIBESegmentator
 pip install torch torchvision torchaudio
 
 # Install required Python packages
-pip install TPTBox ruamel.yaml configargparse
+pip install TPTBox==0.7.6
 pip install nnunetv2 
-# We recommend the newest versions. Tested versions: TPTBox==1.6, ruamel.yaml==0.18.6, configargparse==1.7, nnunetv2==2.4.2
 
 # If e. g. nnunetv2 does not work, try version 2.4.2
 # Uninstall the current version and reinstall with the specified version
@@ -73,8 +72,26 @@ pip install nnunetv2
 # Download the scripts (they will be downloaded to your current folder)
 git clone https://github.com/robert-graf/VIBESegmentator.git
 cd VIBESegmentator
+
+
 ```
 It should take less than 30 minutes to install, excluding installing conda/python. The longest time takes to install pytroch. 
+
+### Python 3.9
+
+Many packages are dropping support for Python 3.9, making it increasingly difficult for `pip` to automatically resolve compatible dependency versions.
+
+**We do not recommend using Python 3.9. Avoid it if you have the option to use a newer Python version.**
+
+```bash
+# Install PyTorch compatible with your GPU
+# Follow the instructions at https://pytorch.org/get-started/locally/
+
+# pip install "dicom2nifti==2.0.1"
+# pip install "acvl_utils==0.2"
+# pip install "nnunetv2==2.5.2"
+# pip install "TPTBox==0.7.6"
+```
 ## Download
 
 Download the nnUNet weights automatically. They are put in `[Path to this project]/nnUNet/nnUNet_results/`. 
