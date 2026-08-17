@@ -61,13 +61,8 @@ conda activate VIBESegmentator
 pip install torch torchvision torchaudio
 
 # Install required Python packages
-pip install TPTBox==0.7.6
+pip install TPTBox # use ==0.8.0 or ==0.7.6 if you encounter issues with newer versions.
 pip install nnunetv2 
-
-# If e. g. nnunetv2 does not work, try version 2.4.2
-# Uninstall the current version and reinstall with the specified version
-#pip uninstall nnunetv2
-#pip install nnunetv2==2.4.2
 
 # Download the scripts (they will be downloaded to your current folder)
 git clone https://github.com/robert-graf/VIBESegmentator.git
